@@ -37,6 +37,7 @@
         })
           .then((res) => {
             // 결제 승인 요청
+            res.customerKey = customerKey
             return axios.post('http://localhost:3000/confirm-payment', res)
           })
           .then(() => {

@@ -48,27 +48,32 @@ app.get('/callback-auth', async (req, res) => {
 
 // 최종 결제 승인
 app.post('/confirm-payment', async (req, res) => {
-  await axios.post(
-    `https://api.tosspayments.com/v1/payments/${encodeURIComponent(
-      req.body.paymentKey
-    )}`,
-    {
-      orderId: req.body.orderId,
-      amount: req.body.amount,
-    },
-    {
-      headers: {
-        // [TODO] 상점의 사용자명을 `SECRET_KEY` 부분에 추가하세요.
-        // 문서: https://docs-staging.tosspayments.com/guides/brandpay/auth#2-브랜드페이-access-token-요청
-        Authorization: `Basic ${Buffer.from(SECRET_KEY + ':', 'utf8').toString(
-          'base64'
-        )}`,
-        'Content-Type': 'application/json',
+  try {
+    await axios.post(
+      `https://api.tosspayments.com/v1/brandpay/payments/confirm`,
+      {
+        customerKey: req.body.customerKey,
+        paymentKey: req.body.paymentKey,
+        orderId: req.body.orderId,
+        amount: req.body.amount,
       },
-    }
-  );
+      {
+        headers: {
+          // [TODO] Basic 인증 방식의 사용자명과 비밀번호는 콜론으로 구분해서 `사용자명:비밀번호`로 추가합니다. 상점의 시크릿 키를 사용자명으로, 비밀번호는 공백으로 추가한 뒤 base64로 인코딩하세요.
+          // 문서: https://docs-staging.tosspayments.com/guides/brandpay/auth#2-브랜드페이-access-token-요청
+          Authorization: `Basic ${Buffer.from(SECRET_KEY + ":", "utf8").toString(
+            "base64"
+          )}`,
+          "Content-Type": "application/json",
+        },
+      }
+    )
+    res.status(200).send('OK');
+  } catch (error) {
+    console.error(error.response.data.message)
 
-  res.status(200).send('OK')
+    res.status(500).send(error.response.data.message)
+  };  
 })
 
 // 결제 실패 페이지
