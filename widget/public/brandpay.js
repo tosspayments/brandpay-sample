@@ -29,7 +29,7 @@ async function initialize() {
     ui: {
       promotionSection: {
         summary: {
-          visible: false,
+          visible: true,
         },
         description: {
           visible: true,
@@ -60,6 +60,11 @@ async function handleSubmit(e) {
   const widgetPaymentParams = paymentMethodsWidget.getPaymentParams();
 
   await brandpay.requestPayment({
+    orderId: 'ORDER_ID', // 주문에 대한 고유한 ID 값
+    orderName: '생수 외 1건', // 결제에 대한 주문명
+    successUrl: window.location.origin + '/success',
+    failUrl: window.location.origin + '/fail',
+    ...widgetPaymentParams,
     ...paymentParams,
     ...widgetPaymentParams,
   });
